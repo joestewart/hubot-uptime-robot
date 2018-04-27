@@ -10,7 +10,7 @@
 #   HUBOT_UPTIMEROBOT_APIKEY
 #
 # Commands:
-#   hubot uptime - Shows the current Uptime Robot monitor status
+#   hubot uptime <filter> - Shows the current Uptime Robot monitor status
 #
 # Author:
 #   mhemmings
@@ -19,8 +19,16 @@ Table = require 'easy-table'
 
 apiKey = process.env.HUBOT_UPTIMEROBOT_APIKEY
 
+REGEX = ///
+    uptime
+    (       # 1)
+      \s+   #    whitespace
+      (.*)  # 2) filter
+    )?
+  ///i
+
 module.exports = (robot) ->
-  robot.respond /uptime/i, (res) ->
+  robot.respond REGEX, (res) ->
     robot.http('https://api.uptimerobot.com/getMonitors')
       .query({
         apiKey: apiKey
@@ -41,9 +49,19 @@ module.exports = (robot) ->
           res.send 'No monitors registered'
           return
 
+        filter = res.match[2]
+
+        monitors = data.monitors.monitor
+
+        if filter
+          query = require 'array-query'
+          monitors = query('friendlyname')
+            .regex(new RegExp filter, 'i')
+            .on data.monitors.monitor
+
         t = new Table
 
-        data.monitors.monitor.forEach (monitor) ->
+        monitors.forEach (monitor) ->
           status = switch monitor.status
             when '0' then 'Paused'
             when '1' then 'Not Checked Yet'
