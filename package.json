@@ -13,6 +13,7 @@
     "url": "https://github.com/itgurus/hubot-uptime-robot/issues"
   },
   "dependencies": {
+    "array-query": "~0.1.0",
     "easy-table": "^1.0.0"
   },
   "peerDependencies": {
