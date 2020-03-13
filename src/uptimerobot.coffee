@@ -34,6 +34,7 @@ module.exports = (robot) ->
         apiKey: apiKey
         format: "json"
         noJsonCallback: 1
+        search: res.match[2]
       })
       .get() (err, resp, body) ->
         if err
@@ -49,15 +50,7 @@ module.exports = (robot) ->
           res.send 'No monitors registered'
           return
 
-        filter = res.match[2]
-
         monitors = data.monitors.monitor
-
-        if filter
-          query = require 'array-query'
-          monitors = query('friendlyname')
-            .regex(new RegExp filter, 'i')
-            .on data.monitors.monitor
 
         t = new Table
 
